@@ -1,28 +1,33 @@
-// Registrar Service Worker
-if ('serviceWorker' in navigator) {
-    navigator.serviceWorker.register('./sw.js')
-        .then(() => console.log('Service Worker registrado'))
-        .catch(err => console.error('Error al registrar SW', err));
-}
+document.addEventListener('DOMContentLoaded', () => {
 
-// Geolocalización + mapa
-document.getElementById('btn-geo').addEventListener('click', () => {
-    if (!navigator.geolocation) {
-        alert('Geolocalización no soportada');
-        return;
+    // Registrar Service Worker
+    if ('serviceWorker' in navigator) {
+        navigator.serviceWorker.register('./sw.js')
+            .then(() => console.log('Service Worker registrado'))
+            .catch(err => console.error('Error SW', err));
     }
 
-    navigator.geolocation.getCurrentPosition(
-        (pos) => {
-            const lat = pos.coords.latitude;
-            const lng = pos.coords.longitude;
+    const btn = document.getElementById('btn-geo');
+    const coordsText = document.getElementById('coords');
+    const map = document.getElementById('map');
 
-            document.getElementById('coords').textContent =
-                `Latitud: ${lat}, Longitud: ${lng}`;
+    btn.addEventListener('click', () => {
+        if (!navigator.geolocation) {
+            coordsText.textContent = 'Geolocalización no soportada';
+            return;
+        }
 
-            document.getElementById('map').src =
-                `https://www.google.com/maps?q=${lat},${lng}&z=15&output=embed`;
-        },
-        () => alert('Permiso denegado')
-    );
+        navigator.geolocation.getCurrentPosition(
+            (pos) => {
+                const lat = pos.coords.latitude;
+                const lng = pos.coords.longitude;
+
+                coordsText.textContent = `Latitud: ${lat}, Longitud: ${lng}`;
+                map.src = `https://www.google.com/maps?q=${lat},${lng}&z=15&output=embed`;
+            },
+            () => {
+                coordsText.textContent = 'Permiso denegado';
+            }
+        );
+    });
 });

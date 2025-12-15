@@ -30,9 +30,8 @@ self.addEventListener('activate', event => {
     self.clients.claim();
 });
 
-sself.addEventListener('fetch', (event) => {
+self.addEventListener('fetch', event => {
     event.respondWith(
-        caches.match(event.request)
-            .then(response => response || new Response('', { status: 404 }))
+        caches.match(event.request).then(resp => resp || fetch(event.request))
     );
 });
