@@ -1,22 +1,28 @@
-const status = document.getElementById('status');
-const coords = document.getElementById('coords');
+// Registrar Service Worker
+if ('serviceWorker' in navigator) {
+    navigator.serviceWorker.register('./sw.js')
+        .then(() => console.log('Service Worker registrado'))
+        .catch(err => console.error('Error al registrar SW', err));
+}
 
+// Geolocalización + mapa
 document.getElementById('btn-geo').addEventListener('click', () => {
     if (!navigator.geolocation) {
-        status.textContent = 'Geolocalización no soportada';
+        alert('Geolocalización no soportada');
         return;
     }
 
-    status.textContent = 'Obteniendo ubicación...';
-
     navigator.geolocation.getCurrentPosition(
-        position => {
-            const { latitude, longitude } = position.coords;
-            status.textContent = 'Ubicación obtenida ✔️';
-            coords.textContent = `Lat: ${latitude}, Lng: ${longitude}`;
+        (pos) => {
+            const lat = pos.coords.latitude;
+            const lng = pos.coords.longitude;
+
+            document.getElementById('coords').textContent =
+                `Latitud: ${lat}, Longitud: ${lng}`;
+
+            document.getElementById('map').src =
+                `https://www.google.com/maps?q=${lat},${lng}&z=15&output=embed`;
         },
-        error => {
-            status.textContent = 'Error al obtener ubicación';
-        }
+        () => alert('Permiso denegado')
     );
 });

@@ -30,22 +30,9 @@ self.addEventListener('activate', event => {
     self.clients.claim();
 });
 
-self.addEventListener('fetch', event => {
-    const url = new URL(event.request.url);
-
-    if (url.origin === location.origin) return;
-
+sself.addEventListener('fetch', (event) => {
     event.respondWith(
-        caches.match(event.request).then(cachedResponse => {
-            if (cachedResponse) {
-                return cachedResponse;
-            }
-            return fetch(event.request).then(networkResponse => {
-                return caches.open(CACHE_NAME).then(cache => {
-                    cache.put(event.request, networkResponse.clone());
-                    return networkResponse;
-                });
-            });
-        })
+        caches.match(event.request)
+            .then(response => response || new Response('', { status: 404 }))
     );
 });
